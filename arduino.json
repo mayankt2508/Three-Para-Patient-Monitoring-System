@@ -1,6 +1,0 @@
-{
-    "sketch": "spo2sensor.ino",
-    "output": "build",
-    "board": "arduino:avr:uno",
-    "port": "COM11"
-}
