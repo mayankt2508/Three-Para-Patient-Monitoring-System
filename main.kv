@@ -1,0 +1,309 @@
+#:import dp kivy.metrics.dp
+#:import Waveform waveform.Waveform
+#:import FFTGraph waveform.FFTGraph
+
+<SectionTitle@Label>:
+    size_hint_y: None
+    height: dp(22)
+    halign: "center"
+    valign: "middle"
+    text_size: self.size
+    font_size: 20
+
+<ParameterBox@BoxLayout>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: 0.7, 1, 0.7, 0.05
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [20]
+
+<ParameterTitle@Label>:
+    size_hint: None, None
+    size: self.texture_size
+    padding: [10]
+    color: 1, 1, 1, 0.7
+    font_size: 22
+
+<ParameterValue@Label>:
+    font_size: 50
+    bold: True
+
+<UpdateModalContent@BoxLayout>:
+    orientation: "vertical"
+    padding: [24, 24, 24, 24]
+    spacing: dp(16)
+
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.11, 0.15, 0.98
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [18]
+
+    Label:
+        text: "Update Software"
+        size_hint_y: None
+        height: dp(36)
+        bold: True
+        halign: "left"
+        valign: "middle"
+        text_size: self.size
+        color: 1, 1, 1, 1
+        font_size: "24sp"
+
+    Label:
+        text: "Pull the latest code and close the app?"
+        # size_hint_y: None
+        # height: self.texture_size[1] + 10
+        color: 1, 1, 1, 0.8
+
+    Widget:
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(44)
+        spacing: dp(12)
+
+        Button:
+            text: "View Log"
+            on_press: app.root.open_log_modal()
+
+        Button:
+            text: "Cancel"
+            on_press: app.root.close_update_modal()
+
+        Button:
+            text: "Update"
+            on_press: app.root.updateSoftware()
+
+<LogModalContent@BoxLayout>:
+    orientation: "vertical"
+    padding: [24, 24, 24, 24]
+    spacing: dp(16)
+
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.11, 0.15, 0.98
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [18]
+
+    Label:
+        text: "Application Log"
+        size_hint_y: None
+        height: dp(36)
+        bold: True
+        halign: "left"
+        valign: "middle"
+        text_size: self.size
+        color: 1, 1, 1, 1
+        font_size: "24sp"
+
+    TextInput:
+        id: log_text
+        readonly: True
+        multiline: True
+        text: ""
+        font_size: "14sp"
+
+    Button:
+        size_hint_y: None
+        height: dp(44)
+        text: "Close"
+        on_press: app.root.close_log_modal()
+
+<ExtraWaveformsPanel@BoxLayout>:
+    orientation: "vertical"
+    size_hint_y: 2
+    spacing: dp(8)
+
+    SectionTitle:
+        text: "IR (d / dt) Rate-Of-Change Waveform"
+        color: 1, 0.8, 0.4, 1
+
+    Waveform:
+        id: ir_delta_waveform
+        size_hint_y: 1
+        ymin: -200
+        ymax: 200
+        fps: 60
+        time_window_sec: 20
+        autoscale_window_sec: self.time_window_sec / 2
+        major_x_ticks: 5
+        major_y_ticks: 5
+        auto_scale: True
+        max_ymax: 35000
+        min_ymin: -35000
+        graph_color: 1, 0.8, 0.4, 1
+
+    SectionTitle:
+        text: "IR FFT (Harmonics present out of 25Hz)"
+        color: 1, 0.8, 0.2, 1
+
+    FFTGraph:
+        id: fft_graph
+        size_hint_y: 1
+        max_frequency: 25
+        major_x_ticks: 4
+        major_y_ticks: 4
+        graph_color: 1, 0.8, 0.2, 1
+
+<MainLayout>:
+    orientation: "vertical"
+    padding: [40, 20, 20, 20]
+    spacing: dp(12)
+
+    canvas.before:
+        Color:
+            rgba: 0.08, 0.09, 0.12, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        size_hint_y: None
+        height: dp(48)
+        spacing: dp(12)
+
+        Label:
+            text: "SpO2 and Heart Rate Monitor"
+            size_hint_x: None
+            width: self.texture_size[0]
+            color: 1, 1, 1, 1
+            bold: True
+            font_size: "30sp"
+
+        Widget:
+        
+        Button:
+            text: "Extra Waveforms"
+            size_hint_x: None
+            width: dp(180)
+            on_press: root.toggle_extra_waveforms()
+            padding: [10]
+
+        Button:
+            text: "Update Software"
+            size_hint_x: None
+            width: dp(180)
+            on_press: root.open_update_modal()
+            padding: [10]
+
+    BoxLayout:  # Entire main screen container.
+        spacing: 20
+
+        BoxLayout:  # Graph container.
+            id: graph_container
+            orientation: 'vertical'
+            spacing: 15
+
+            SectionTitle:
+                id: red_label
+                text: "RED LED (RAW) Readings"
+                color: 1, 0, 0, 1
+
+            Waveform:
+                id: top_waveform
+                size_hint_y: 1
+                ymin: 0
+                ymax: 1024
+                fps: 60
+                time_window_sec: 20
+                autoscale_window_sec: self.time_window_sec / 2
+                major_x_ticks: 5
+                major_y_ticks: 5
+                auto_scale: True
+                max_ymax: 35000
+                min_ymin: -35000
+                graph_color: 1, 0.3, 0.3, 1
+
+            SectionTitle:
+                id: ir_label
+                text: "IR LED (RAW) Readings"
+                color: 1, 0, 1, 1
+
+            Waveform:
+                id: bottom_waveform
+                size_hint_y: 1
+                ymin: 0
+                ymax: 1024
+                fps: 60
+                time_window_sec: 20
+                autoscale_window_sec: self.time_window_sec / 2 
+                major_x_ticks: 5
+                major_y_ticks: 5
+                auto_scale: True
+                max_ymax: 35000
+                min_ymin: -35000
+                graph_color: 1, 0.3, 1, 1
+
+            SectionTitle:
+                id: pleth_label
+                text: "Plethysmograph (Pleth)"
+                color: 0, 1, 1, 1
+
+            Waveform:
+                id: pleth_waveform
+                size_hint_y: 1
+                ymin: 0
+                ymax: 100
+                fps: 60
+                time_window_sec: 20
+                autoscale_window_sec: self.time_window_sec / 2
+                major_x_ticks: 5
+                major_y_ticks: 5
+                auto_scale: True
+                max_ymax: 1200
+                min_ymin: 0
+                graph_color: 0, 1, 1, 1
+
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            size_hint_x: 0.3
+
+            ParameterBox:
+                ParameterTitle:
+                    text: "SpO2 (%)"
+                
+                ParameterValue:
+                    text: root.spo2
+                    color: 0, 1, 1, 1
+
+            ParameterBox:
+                BoxLayout:
+                    padding: [10, 0]
+                    size_hint_y: None
+                    height: self.minimum_height
+
+                    ParameterTitle:
+                        text: "HR per min."
+                        
+                    Widget:
+
+                    Image:
+                        source: "media/heart-rate-icon.png"
+                        size_hint: None, None
+                        size: dp(32), dp(32)
+                        color: root.heart_icon_color
+
+                ParameterValue:
+                    text: root.heartrate
+
+            ParameterBox:
+                ParameterTitle:
+                    text: "Data Capture Status:"
+
+                Label:
+                    text: root.status_text
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'top'
+                    padding: [10]
+
+MainLayout:
