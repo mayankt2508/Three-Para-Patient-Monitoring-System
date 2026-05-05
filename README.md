@@ -150,7 +150,3 @@ Special thanks to:
 - Sunrom SpO₂ Sensor Documentation
 
 ---
-
-📜 License
-
-This project is developed for academic and educational purposes.
